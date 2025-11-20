@@ -7,53 +7,39 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## Tentang Proyek: Smart Access (Sistem Kunci Pintu Digital)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+[cite_start]Proyek ini adalah aplikasi berbasis web yang dirancang untuk sistem **Smart Access**, sebuah inovasi sistem kunci pintu digital yang menggunakan pemindai **QR Code** sebagai metode autentikasi utama[cite: 7]. [cite_start]Sistem ini dibangun untuk menggantikan penggunaan kunci fisik konvensional dengan solusi yang lebih efisien, aman, dan mudah dikelola[cite: 15].
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+[cite_start]Aplikasi ini berfungsi sebagai antarmuka manajemen (dashboard) yang memungkinkan administrator untuk mengelola hak akses pengguna secara *real-time*, memantau aktivitas pintu, dan menghubungkan logika perangkat lunak dengan perangkat keras (mikrokontroler/solenoid lock)[cite: 15, 29].
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Fitur Utama
 
-## Learning Laravel
+Berikut adalah fitur-fitur kunci yang dikembangkan dalam sistem ini untuk menjawab kebutuhan keamanan dan efisiensi akses:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- [cite_start]**Autentikasi QR Code**: Menggunakan kode QR sebagai kunci digital untuk membuka pintu, menggantikan kunci fisik, kartu RFID, atau PIN[cite: 10, 15].
+- [cite_start]**Manajemen Akses Terpusat**: Admin dapat menambah, menghapus, dan memodifikasi hak akses pengguna melalui antarmuka website yang *user-friendly*[cite: 15, 27].
+- [cite_start]**Monitoring Real-Time**: Menyediakan log aktivitas untuk memantau siapa yang mengakses pintu dan kapan akses tersebut dilakukan[cite: 15, 27].
+- [cite_start]**Dashboard Admin**: Antarmuka visual untuk pengelolaan sistem secara menyeluruh, mengatasi kesenjangan penelitian sebelumnya yang hanya fokus pada akses *single-user*[cite: 26, 27].
+- [cite_start]**Integrasi IoT**: Dirancang untuk berkomunikasi dengan mikrokontroler (seperti Raspberry Pi atau ESP32) guna menggerakkan *solenoid lock*[cite: 29].
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Latar Belakang Masalah
 
-## Laravel Sponsors
+[cite_start]Sistem ini dikembangkan untuk mengatasi keterbatasan kunci konvensional dan meningkatkan keamanan di lingkungan seperti perkantoran, area residensial (rumah/kos), fasilitas pendidikan (perpustakaan), atau ruang loker[cite: 15]. [cite_start]Kajian literatur menunjukkan adanya tren peralihan dari kunci fisik ke autentikasi digital, namun masih kurangnya solusi yang menawarkan manajemen akses terpusat yang komprehensif berbasis website[cite: 21, 24].
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Teknologi yang Digunakan
 
-### Premium Partners
+- **Framework Backend**: Laravel (PHP).
+- [cite_start]**Metode Autentikasi**: QR Code Generator & Scanner[cite: 28].
+- [cite_start]**Perangkat Keras Pendukung**: Mikrokontroler (Arduino/Raspberry Pi) & Solenoid Lock[cite: 29].
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Identitas Pengembang
 
-## Contributing
+- [cite_start]**Nama**: Daffa Ramadhan [cite: 4]
+- [cite_start]**NIM**: 714240018 [cite: 4]
+- [cite_start]**Program Studi**: D4 TI ULBI [cite: 5]
+- [cite_start]**Kelas**: 2B [cite: 5]
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
+## Lisensi
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
