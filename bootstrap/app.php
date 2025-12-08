@@ -11,8 +11,32 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->trustProxies(at: '*');
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->shouldRenderJsonWhen(function ($request, $e) {
+            if ($request->is('api/*')) {
+                return true;
+            }
+
+            return $request->expectsJson();
+        });
+
+        // Log CSRF token failures
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            \Log::error('CSRF Token Mismatch', [
+                'url' => $request->url(),
+                'method' => $request->method(),
+                'session_id' => $request->session()->getId() ?? 'NO_SESSION',
+            ]);
+            
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'CSRF token mismatch'], 419);
+            }
+
+            return back()->withErrors(['csrf' => 'CSRF token expired. Please refresh and try again.'])->withInput();
+        });
     })->create();
