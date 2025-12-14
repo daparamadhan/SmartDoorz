@@ -39,12 +39,13 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'status' => 'pending', // Set status pending untuk user baru
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('home'))->with('message', 'Akun berhasil dibuat. Menunggu persetujuan admin untuk alokasi ruangan.');
     }
 }

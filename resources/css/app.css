@@ -1,3 +1,97 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Styles */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    body {
+        font-family: 'Figtree', sans-serif;
+    }
+}
+
+@layer components {
+    /* Sidebar Styles */
+    .sidebar-link {
+        @apply flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-gray-50;
+    }
+    
+    .sidebar-link.active {
+        @apply bg-blue-50 text-blue-700 border-r-2 border-blue-500;
+    }
+    
+    /* Card Styles */
+    .dashboard-card {
+        @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    }
+    
+    /* Button Styles */
+    .btn-primary {
+        @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    }
+    
+    .btn-secondary {
+        @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    }
+}
+
+@layer utilities {
+    /* Custom utilities */
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+}
+
+/* Custom Styles */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    body {
+        font-family: 'Figtree', sans-serif;
+    }
+}
+
+@layer components {
+    /* Sidebar Styles */
+    .sidebar-link {
+        @apply flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-gray-50;
+    }
+    
+    .sidebar-link.active {
+        @apply bg-blue-50 text-blue-700 border-r-2 border-blue-500;
+    }
+    
+    /* Card Styles */
+    .dashboard-card {
+        @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    }
+    
+    /* Button Styles */
+    .btn-primary {
+        @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    }
+    
+    .btn-secondary {
+        @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    }
+}
+
+@layer utilities {
+    /* Custom utilities */
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+}

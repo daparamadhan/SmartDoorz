@@ -3,7 +3,7 @@
 @section('title', 'Analitik Dashboard')
 
 @section('content')
-<div class="container mx-auto py-6">
+<div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-4xl font-bold text-gray-900">Analitik Dashboard</h1>

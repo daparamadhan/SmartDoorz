@@ -8,8 +8,16 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\QrScannerController;
+use App\Http\Controllers\RentalController;
+use App\Http\Controllers\AdminController;
 
-Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('home');
+// Landing page (public)
+Route::get('/', function () {
+    return view('welcome');
+})->name('welcome');
+
+// Dashboard (authenticated users)
+Route::get('/home', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('home');
 // Keep a /dashboard path but name it `dashboard.index` so older redirects/controllers
 // that reference `route('dashboard.index')` continue to work.
 Route::get('/dashboard', function() { return redirect()->route('home'); })->name('dashboard.index');
@@ -23,12 +31,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/scanner', [QrScannerController::class, 'index'])->name('scanner.index');
     Route::post('/scanner/scan', [QrScannerController::class, 'scan'])->name('scanner.scan');
     
+    // Rental Management
+    Route::get('/rental', [RentalController::class, 'index'])->name('rental.page');
+    Route::post('/rental/extend', [RentalController::class, 'extend'])->name('rental.extend');
+    
     // Admin only
     Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('barcode', BarcodeController::class);
         Route::resource('rooms', RoomController::class);
         Route::get('/rooms/{room}/print-qr', [RoomController::class, 'printQrCode'])->name('rooms.print-qr');
+        
+        // Room Allocation
+        Route::get('/admin/room-allocation', [AdminController::class, 'roomAllocation'])->name('admin.room-allocation');
+        Route::post('/admin/allocate-room', [AdminController::class, 'allocateRoom'])->name('admin.allocate-room');
     });
 
     // Send barcode link to user (admin)
@@ -48,3 +64,13 @@ require __DIR__.'/auth.php';
 
 // Public route for downloading barcode images via signed URL
 Route::get('/barcode/download/{user}/{file}', [BarcodeController::class, 'download'])->name('barcode.download');
+
+// Public scanner route (no CSRF)
+Route::post('/api/scanner/scan', [QrScannerController::class, 'scanPublic'])->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
+
+// Test route
+Route::get('/api/test', function() {
+    return response()->json(['status' => 'API working', 'time' => now()]);
+});
+
+

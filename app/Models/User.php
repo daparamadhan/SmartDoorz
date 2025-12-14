@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'rental_start',
+        'rental_end',
+        'rental_months',
     ];
 
     /**
@@ -43,7 +46,21 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'rental_start' => 'datetime',
+            'rental_end' => 'datetime',
         ];
+    }
+
+    public function isRentalExpired()
+    {
+        return $this->rental_end && $this->rental_end->isPast();
+    }
+
+    public function getRentalStatusAttribute()
+    {
+        if (!$this->rental_start) return 'pending';
+        if ($this->isRentalExpired()) return 'expired';
+        return 'active';
     }
 
     public function room()

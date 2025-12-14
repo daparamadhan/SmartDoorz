@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use App\Models\DoorAccessLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class QrScannerController extends Controller
 {
@@ -60,5 +61,45 @@ class QrScannerController extends Controller
                 'room_number' => $room->room_number,
             ]
         ]);
+    }
+
+    public function scanPublic(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'qr_code' => 'required|string',
+            ]);
+
+            $room = Room::where('qr_code', $validated['qr_code'])->first();
+
+            if (!$room) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'QR Code tidak ditemukan atau tidak valid'
+                ]);
+            }
+
+            // Log akses tanpa user_id (akses publik)
+            DoorAccessLog::create([
+                'room_id' => $room->id,
+                'user_id' => null,
+                'qr_code' => $validated['qr_code'],
+                'status' => 'success',
+                'access_time' => now(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pintu berhasil dibuka! Ruangan ' . $room->room_number
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Scanner error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan sistem'
+            ]);
+        }
     }
 }
