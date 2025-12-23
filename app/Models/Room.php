@@ -32,4 +32,37 @@ class Room extends Model
     {
         return $this->hasMany(DoorAccessLog::class);
     }
+
+    public function getRoomStatus()
+    {
+        if ($this->status === 'maintenance') {
+            return 'maintenance';
+        }
+        
+        if (!$this->user_id) {
+            return 'available';
+        }
+        
+        if ($this->user && $this->user->status === 'delay') {
+            return 'delay';
+        }
+        
+        return 'occupied';
+    }
+
+    public function getStatusColor()
+    {
+        switch ($this->getRoomStatus()) {
+            case 'available':
+                return 'bg-green-500';
+            case 'occupied':
+                return 'bg-red-500';
+            case 'delay':
+                return 'bg-blue-500';
+            case 'maintenance':
+                return 'bg-gray-500';
+            default:
+                return 'bg-gray-500';
+        }
+    }
 }

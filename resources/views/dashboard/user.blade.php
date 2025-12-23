@@ -80,12 +80,16 @@
             <!-- My Rooms Card -->
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <h3 class="text-xl font-bold text-gray-900 mb-4">🚪 Ruangan Saya</h3>
-                @if(auth()->user()->rooms->count() > 0)
+                @php
+                    $userRooms = auth()->user()->rooms;
+                @endphp
+                @if($userRooms->count() > 0)
                 <div class="space-y-3">
-                    @foreach(auth()->user()->rooms as $room)
+                    @foreach($userRooms as $room)
                     <div class="bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-green-500 p-4 rounded">
                         <p class="font-semibold text-gray-900">Ruangan {{ $room->room_number }}</p>
-                        <p class="text-xs text-gray-600 mt-1 font-mono break-all">{{ $room->qr_code }}</p>
+                        <p class="text-xs text-gray-600 mt-1">Status: {{ ucfirst($room->status) }}</p>
+                        <p class="text-xs text-gray-600 mt-1 font-mono break-all">QR: {{ $room->qr_code }}</p>
                         <button type="button" onclick="testScan('{{ $room->qr_code }}')" 
                             class="mt-3 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 rounded text-sm transition">
                             Test Scan
@@ -95,7 +99,9 @@
                 </div>
                 @else
                 <div class="bg-yellow-50 border border-yellow-200 rounded p-4">
-                    <p class="text-yellow-900 text-sm">⚠️ Belum ada ruangan yang ditugaskan. Hubungi admin.</p>
+                    <p class="text-yellow-900 text-sm">⚠️ Belum ada ruangan yang ditugaskan.</p>
+                    <p class="text-yellow-700 text-xs mt-1">User ID: {{ auth()->user()->id }}</p>
+                    <p class="text-yellow-700 text-xs">Status: {{ auth()->user()->status }}</p>
                 </div>
                 @endif
             </div>
@@ -133,28 +139,8 @@
     </div>
 </div>
 
-<!-- Modal untuk hasil scan -->
-<div id="resultModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full text-center">
-        <div id="resultIcon" class="inline-block p-4 bg-gray-100 rounded-full mb-4">
-            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-        </div>
-        <h3 id="resultTitle" class="text-2xl font-bold text-gray-900 mb-3">Loading...</h3>
-        <p id="resultMessage" class="text-gray-600 mb-6 text-lg"></p>
-        <button type="button" onclick="closeModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition w-full">
-            Tutup
-        </button>
-    </div>
-</div>
-
 <script>
     const qrInput = document.getElementById('qr_code');
-    const resultModal = document.getElementById('resultModal');
-    const resultIcon = document.getElementById('resultIcon');
-    const resultTitle = document.getElementById('resultTitle');
-    const resultMessage = document.getElementById('resultMessage');
     
     // Camera elements
     const openCameraBtn = document.getElementById('openCameraBtn');
@@ -272,61 +258,40 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({ qr_code: qrCode })
             });
 
+            if (!response.ok) {
+                alert('❌ QR tidak valid');
+                return;
+            }
+
             const data = await response.json();
             showResult(data);
         } catch (error) {
-            showResult({
-                status: 'failed',
-                message: 'Terjadi kesalahan: ' + error.message,
-                action: 'error'
-            });
+            alert('❌ QR tidak valid');
         }
     }
 
     function showResult(data) {
-        let icon = '';
-        let bgColor = '';
-        let titleClass = '';
-        let title = '';
-
         if (data.status === 'success') {
-            icon = '<svg class="w-16 h-16 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
-            bgColor = 'bg-green-100';
-            titleClass = 'text-green-600';
-            title = 'Akses Berhasil! 🎉';
+            alert('✅ Pintu berhasil dibuka!');
         } else if (data.status === 'unauthorized') {
-            icon = '<svg class="w-16 h-16 text-yellow-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>';
-            bgColor = 'bg-yellow-100';
-            titleClass = 'text-yellow-600';
-            title = 'Akses Ditolak ⚠️';
+            alert('❌ QR tidak valid - Anda tidak memiliki akses ke ruangan ini');
+        } else if (data.status === 'failed') {
+            alert('❌ QR tidak valid - Kode QR tidak ditemukan');
+        } else if (data.status === 'loading') {
+            // Skip alert for loading state
+            return;
         } else {
-            icon = '<svg class="w-16 h-16 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
-            bgColor = 'bg-red-100';
-            titleClass = 'text-red-600';
-            title = 'Kode Tidak Valid ❌';
-        }
-
-        resultIcon.innerHTML = `<div class="${bgColor} inline-block p-4 rounded-full">${icon}</div>`;
-        resultTitle.textContent = title;
-        resultTitle.className = `text-2xl font-bold mb-3 ${titleClass}`;
-        resultMessage.textContent = data.message;
-        resultModal.classList.remove('hidden');
-
-        // Auto-close successful access modal after 2.5 seconds
-        if (data.status === 'success') {
-            setTimeout(() => {
-                closeModal();
-            }, 2500);
+            alert('❌ QR tidak valid');
         }
     }
 
     function closeModal() {
-        resultModal.classList.add('hidden');
         qrInput.focus();
     }
 

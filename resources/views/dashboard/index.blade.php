@@ -91,23 +91,23 @@
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                         <p class="text-sm text-gray-600">Pengguna Admin</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $totalUsers > 0 ? 1 : 0 }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $adminUsers }}</p>
                     </div>
                     <span class="text-3xl text-blue-500">👑</span>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                         <p class="text-sm text-gray-600">Pengguna Regular</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $totalUsers - 1 }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $regularUsers }}</p>
                     </div>
                     <span class="text-3xl text-purple-500">👤</span>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                        <p class="text-sm text-gray-600">Tingkat Okupansi</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100, 0) : 0 }}%</p>
+                        <p class="text-sm text-gray-600">Pengguna Delay</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $delayUsers }}</p>
                     </div>
-                    <span class="text-3xl text-green-500">📊</span>
+                    <span class="text-3xl text-orange-500">⏰</span>
                 </div>
             </div>
         </div>
@@ -139,7 +139,7 @@
                     @forelse($recentAccessLogs as $log)
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 py-3 text-gray-900">
-                            <span class="font-medium">{{ $log->access_time->format('d/m H:i') }}</span>
+                            <span class="font-medium">{{ $log->access_time->setTimezone('Asia/Jakarta')->format('d/m/Y H:i:s') }}</span>
                         </td>
                         <td class="px-4 py-3 text-gray-900">
                             @if($log->user)
@@ -213,9 +213,9 @@
         $counts = [];
         $allDates = [];
         
-        // Generate last 7 days
+        // Generate last 7 days dengan timezone lokal
         for($i = 6; $i >= 0; $i--) {
-            $allDates[] = now()->subDays($i)->format('Y-m-d');
+            $allDates[] = \Carbon\Carbon::now('Asia/Jakarta')->subDays($i)->format('Y-m-d');
         }
         
         // Map data

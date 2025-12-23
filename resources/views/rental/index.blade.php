@@ -122,29 +122,35 @@
             </div>
         </div>
 
-        <div class="mb-6">
-            <h4 class="font-semibold text-gray-900 mb-3">Metode Pembayaran</h4>
-            <div class="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V10z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-blue-900">QRIS</p>
-                            <p class="text-sm text-blue-700">Scan QR untuk bayar</p>
-                        </div>
-                    </div>
-                    <div class="text-blue-600">✓</div>
-                </div>
+        <form id="paymentForm" class="mb-6">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Metode Pembayaran</label>
+                <select id="paymentMethod" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    <option value="transfer">Transfer Bank</option>
+                    <option value="cash">Tunai</option>
+                    <option value="ewallet">E-Wallet</option>
+                </select>
             </div>
-        </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Referensi / Bukti Pembayaran</label>
+                <input type="text" id="paymentReference" 
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" 
+                    placeholder="Contoh: TRX123456789" required>
+                <p class="text-xs text-gray-500 mt-1">Masukkan nomor transaksi atau kode bukti pembayaran</p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Catatan (Opsional)</label>
+                <textarea id="paymentNotes" rows="3"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" 
+                    placeholder="Tambahkan catatan jika diperlukan..."></textarea>
+            </div>
+        </form>
 
         <div class="flex space-x-3">
             <button onclick="processPayment()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition">
-                Bayar Sekarang
+                Konfirmasi Pembayaran
             </button>
             <button onclick="closePaymentModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-3 px-6 rounded-lg transition">
                 Batal
@@ -153,32 +159,8 @@
     </div>
 </div>
 
-<!-- QRIS Modal -->
-<div id="qrisModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-xl p-8 max-w-sm w-full mx-4 text-center">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">📱 Scan QRIS</h3>
-        <div class="mb-6">
-            <div class="w-48 h-48 mx-auto bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                <div class="text-center">
-                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V10z"/>
-                    </svg>
-                    <p class="text-sm text-gray-500">QR Code QRIS</p>
-                </div>
-            </div>
-        </div>
-        <p class="text-sm text-gray-600 mb-4">Scan dengan aplikasi mobile banking atau e-wallet Anda</p>
-        <div class="text-lg font-bold text-green-600 mb-6">Rp 500.000</div>
-        <button onclick="confirmPayment()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition">
-            Saya Sudah Bayar
-        </button>
-        <button onclick="closeQrisModal()" class="w-full mt-2 text-gray-500 hover:text-gray-700 transition">
-            Batal
-        </button>
-    </div>
-</div>
 
-<script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+
 <script>
     const qrInput = document.getElementById('qr_code');
     const openCameraBtn = document.getElementById('openCameraBtn');
@@ -198,17 +180,19 @@
     }
 
     function processPayment() {
-        closePaymentModal();
-        document.getElementById('qrisModal').classList.remove('hidden');
-        document.getElementById('qrisModal').classList.add('flex');
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const paymentReference = document.getElementById('paymentReference').value.trim();
+        const paymentNotes = document.getElementById('paymentNotes').value.trim();
+        
+        if (!paymentReference) {
+            alert('Harap masukkan nomor referensi atau bukti pembayaran');
+            return;
+        }
+        
+        confirmPayment(paymentMethod, paymentReference, paymentNotes);
     }
 
-    function closeQrisModal() {
-        document.getElementById('qrisModal').classList.add('hidden');
-        document.getElementById('qrisModal').classList.remove('flex');
-    }
-
-    async function confirmPayment() {
+    async function confirmPayment(paymentMethod = 'manual', paymentReference = '', paymentNotes = '') {
         try {
             const response = await fetch('/rental/extend', {
                 method: 'POST',
@@ -216,14 +200,18 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ payment_method: 'qris' })
+                body: JSON.stringify({ 
+                    payment_method: paymentMethod,
+                    payment_reference: paymentReference,
+                    payment_notes: paymentNotes
+                })
             });
 
             const data = await response.json();
             
             if (data.success) {
-                closeQrisModal();
-                alert('✅ Pembayaran berhasil! Sewa diperpanjang sampai ' + data.new_end_date);
+                closePaymentModal();
+                alert('✅ Pembayaran berhasil dikonfirmasi! Sewa diperpanjang sampai ' + data.new_end_date);
                 location.reload();
             } else {
                 alert('❌ ' + data.message);

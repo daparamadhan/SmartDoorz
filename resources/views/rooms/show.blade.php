@@ -76,9 +76,19 @@
                     <div class="text-center">
                         <img src="{{ $room->getQrImageUrl() }}" alt="QR Code" class="w-48 h-48 mx-auto mb-4 p-2 bg-white rounded">
                         <p class="text-xs text-gray-600 mb-3 break-all">{{ $room->qr_code }}</p>
-                        <a href="{{ route('rooms.print-qr', $room) }}" class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition">
-                            Cetak QR Code
-                        </a>
+                        <div class="relative inline-block">
+                            <button onclick="toggleDownloadDropdown()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition">
+                                📥 Download QR Code ▼
+                            </button>
+                            <div id="download-dropdown" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-b shadow-lg z-10 mt-1">
+                                <a href="{{ route('rooms.download-qr', $room) }}?format=png" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Download PNG
+                                </a>
+                                <a href="{{ route('rooms.download-qr', $room) }}?format=jpg" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Download JPG
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -130,4 +140,21 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleDownloadDropdown() {
+    const dropdown = document.getElementById('download-dropdown');
+    dropdown.classList.toggle('hidden');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('[onclick="toggleDownloadDropdown()"]')) {
+        const dropdown = document.getElementById('download-dropdown');
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+        }
+    }
+});
+</script>
 @endsection

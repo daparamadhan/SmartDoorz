@@ -20,7 +20,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+        'status',
         'rental_start',
         'rental_end',
         'rental_months',

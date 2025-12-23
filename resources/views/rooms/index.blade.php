@@ -94,9 +94,19 @@
                 <a href="{{ route('rooms.edit', $room) }}" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white text-sm font-semibold py-2 px-3 rounded transition text-center">
                     Edit
                 </a>
-                <a href="{{ route('rooms.print-qr', $room) }}" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 px-3 rounded transition text-center">
-                    Print QR
-                </a>
+                <div class="flex-1 relative">
+                    <button onclick="toggleDropdown('dropdown-{{ $room->id }}')" class="w-full bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 px-3 rounded transition flex items-center justify-center">
+                        📥 Download QR ▼
+                    </button>
+                    <div id="dropdown-{{ $room->id }}" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-b shadow-lg z-10">
+                        <a href="{{ route('rooms.download-qr', $room) }}?format=png" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Download PNG
+                        </a>
+                        <a href="{{ route('rooms.download-qr', $room) }}?format=jpg" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Download JPG
+                        </a>
+                    </div>
+                </div>
                 <form action="{{ route('rooms.destroy', $room) }}" method="POST" class="flex-1" onsubmit="return confirm('Yakin ingin menghapus ruangan ini?');">
                     @csrf
                     @method('DELETE')
@@ -113,4 +123,29 @@
         @endforelse
     </div>
 </div>
+
+<script>
+function toggleDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+    
+    // Close all other dropdowns
+    allDropdowns.forEach(d => {
+        if (d.id !== dropdownId) {
+            d.classList.add('hidden');
+        }
+    });
+    
+    // Toggle current dropdown
+    dropdown.classList.toggle('hidden');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('[onclick^="toggleDropdown"]')) {
+        const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+        allDropdowns.forEach(d => d.classList.add('hidden'));
+    }
+});
+</script>
 @endsection

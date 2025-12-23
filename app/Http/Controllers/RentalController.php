@@ -14,6 +14,12 @@ class RentalController extends Controller
     
     public function extend(Request $request)
     {
+        $request->validate([
+            'payment_method' => 'required|string',
+            'payment_reference' => 'required|string|max:255',
+            'payment_notes' => 'nullable|string|max:500'
+        ]);
+        
         $user = auth()->user();
         
         // Calculate new end date
@@ -30,11 +36,15 @@ class RentalController extends Controller
         $user->rental_months += 1;
         $user->save();
         
-        // Log payment (optional)
+        // Log payment
         \Log::info('Rental extended', [
             'user_id' => $user->id,
-            'payment_method' => $request->payment_method ?? 'qris',
-            'new_end_date' => $newEndDate
+            'user_name' => $user->name,
+            'payment_method' => $request->payment_method,
+            'payment_reference' => $request->payment_reference,
+            'payment_notes' => $request->payment_notes,
+            'new_end_date' => $newEndDate,
+            'amount' => 500000
         ]);
         
         return response()->json([

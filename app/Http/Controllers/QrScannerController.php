@@ -20,24 +20,39 @@ class QrScannerController extends Controller
             'qr_code' => 'required|string',
         ]);
 
-        $room = Room::where('qr_code', $validated['qr_code'])->first();
+        $qrCode = trim($validated['qr_code']);
+        $room = Room::where('qr_code', $qrCode)->first();
 
         if (!$room) {
+            // Debug: Log QR code yang tidak ditemukan
+            Log::info('QR Code not found: ' . $qrCode);
+            
             return response()->json([
                 'status' => 'failed',
-                'message' => 'QR Code tidak ditemukan. Hubungi admin SmartDoorz',
+                'message' => 'QR Code tidak ditemukan. Kode: ' . $qrCode,
                 'action' => 'error'
             ]);
         }
 
         $currentUser = auth()->user();
+        
+        // Debug: Log user dan room info
+        Log::info('Scan attempt', [
+            'user_id' => $currentUser->id,
+            'user_name' => $currentUser->name,
+            'room_id' => $room->id,
+            'room_number' => $room->room_number,
+            'room_user_id' => $room->user_id,
+            'qr_code' => $qrCode
+        ]);
+        
         $isAuthorized = $room->user_id === $currentUser->id;
 
         // Log akses
         DoorAccessLog::create([
             'room_id' => $room->id,
             'user_id' => $currentUser->id,
-            'qr_code' => $validated['qr_code'],
+            'qr_code' => $qrCode,
             'status' => $isAuthorized ? 'success' : 'unauthorized',
             'access_time' => now(),
             'ip_address' => $request->ip(),
@@ -47,7 +62,7 @@ class QrScannerController extends Controller
         if (!$isAuthorized) {
             return response()->json([
                 'status' => 'unauthorized',
-                'message' => 'Anda tidak memiliki akses ke kamar ini. Hubungi admin SmartDoorz',
+                'message' => 'Anda tidak memiliki akses ke kamar ini. Kamar ' . $room->room_number . ' milik user ID: ' . $room->user_id,
                 'action' => 'error'
             ]);
         }

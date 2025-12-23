@@ -2,6 +2,36 @@
 
 @section('title', 'Pemindai QR Ruangan')
 
+@push('styles')
+<style>
+@keyframes scanLine {
+    0% { 
+        top: 0; 
+        opacity: 1; 
+    }
+    50% { 
+        top: 50%; 
+        opacity: 0.8; 
+    }
+    100% { 
+        top: 100%; 
+        opacity: 1; 
+    }
+}
+
+/* Ensure video is properly sized */
+#qr-reader video {
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 12px;
+}
+
+#qr-reader {
+    position: relative !important;
+}
+</style>
+@endpush
+
 @section('content')
 <div class="container mx-auto py-6">
     <div class="max-w-2xl mx-auto">
@@ -59,7 +89,19 @@
                         <p id="cameraHint" class="text-sm text-gray-500">Pilih kamera yang tersedia di perangkat Anda.</p>
                     </div>
 
-                    <div id="qr-reader" style="width:100%; max-width:480px; margin-bottom:12px; display:none;"></div>
+                    <div id="qr-reader" style="width:100%; max-width:480px; margin-bottom:12px; display:none; position:relative; border-radius:12px; overflow:hidden;">
+                        <!-- Overlay kotak fokus -->
+                        <div id="scanner-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1000; display:none;">
+                            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:250px; height:250px; border:4px solid #10B981; border-radius:20px; box-shadow:0 0 0 9999px rgba(0,0,0,0.6);">
+                                <div style="position:absolute; top:-4px; left:-4px; width:50px; height:50px; border-top:8px solid #10B981; border-left:8px solid #10B981; border-radius:15px 0 0 0;"></div>
+                                <div style="position:absolute; top:-4px; right:-4px; width:50px; height:50px; border-top:8px solid #10B981; border-right:8px solid #10B981; border-radius:0 15px 0 0;"></div>
+                                <div style="position:absolute; bottom:-4px; left:-4px; width:50px; height:50px; border-bottom:8px solid #10B981; border-left:8px solid #10B981; border-radius:0 0 0 15px;"></div>
+                                <div style="position:absolute; bottom:-4px; right:-4px; width:50px; height:50px; border-bottom:8px solid #10B981; border-right:8px solid #10B981; border-radius:0 0 15px 0;"></div>
+                                <div style="position:absolute; top:0; left:0; width:100%; height:4px; background:linear-gradient(90deg, transparent, #10B981, transparent); animation:scanLine 2s linear infinite;"></div>
+                                <div style="position:absolute; top:-60px; left:50%; transform:translateX(-50%); background:#10B981; color:white; padding:10px 20px; border-radius:20px; font-size:14px; font-weight:bold; white-space:nowrap;">📱 Arahkan QR ke kotak hijau</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-6">
@@ -182,10 +224,9 @@
     </div>
 </div>
 
-@push('scripts')
-<script src="https://unpkg.com/html5-qrcode@2.3.3/dist/html5-qrcode.min.js"></script>
-@endpush
+@endsection
 
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
     const form = document.getElementById('scanForm');
     const qrInput = document.getElementById('qr_code');
@@ -206,6 +247,9 @@
     window.addEventListener('load', function() {
         qrInput.focus();
         loadCameras();
+        
+        // Debug: cek apakah html5-qrcode library loaded
+        console.log('Html5Qrcode available:', typeof Html5Qrcode !== 'undefined');
     });
 
     async function loadCameras() {
@@ -244,13 +288,19 @@
 
     function startScanner() {
         if (isScannerRunning) return;
+        
+        // Check if Html5Qrcode is available
+        if (typeof Html5Qrcode === 'undefined') {
+            alert('QR Scanner library tidak ter-load. Silakan refresh halaman.');
+            return;
+        }
 
         if (!html5QrScanner) {
             html5QrScanner = new Html5Qrcode("qr-reader");
         }
 
         const config = { 
-            fps: 10, 
+            fps: 10,
             qrbox: { width: 250, height: 250 }
         };
 
@@ -263,25 +313,50 @@
             { facingMode: "user" },
             config,
             (decodedText, decodedResult) => {
+                console.log('QR Code detected:', decodedText);
+                
+                // Sembunyikan overlay saat QR terdeteksi
+                const overlay = document.getElementById('scanner-overlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
+                
                 qrInput.value = decodedText;
                 stopScanner();
                 submitForm();
+            },
+            (errorMessage) => {
+                // Silent error handling
             }
         ).then(() => {
             isScannerRunning = true;
-            loadCameras();
+            console.log('Scanner started successfully');
+            
+            // Tampilkan overlay
+            const overlay = document.getElementById('scanner-overlay');
+            if (overlay) {
+                overlay.style.display = 'block';
+            }
+            
         }).catch((err) => {
             console.error('Unable to start scanner', err);
             qrReaderEl.style.display = 'none';
             startCameraBtn.classList.remove('hidden');
             stopCameraBtn.classList.add('hidden');
             cameraSelect.disabled = false;
-            alert('Tidak dapat mengakses kamera. Periksa izin browser dan pastikan kamera tidak digunakan aplikasi lain.');
+            alert('Tidak dapat mengakses kamera: ' + err.message);
         });
     }
 
     function stopScanner() {
         if (!isScannerRunning || !html5QrScanner) return;
+        
+        // Sembunyikan overlay
+        const overlay = document.getElementById('scanner-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+        
         try {
             html5QrScanner.stop().then(() => {
                 qrReaderEl.style.display = 'none';
@@ -386,5 +461,3 @@
         qrInput.focus();
     }
 </script>
-
-@endsection

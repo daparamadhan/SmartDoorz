@@ -31,6 +31,19 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <!-- Phone Number -->
+        <div>
+            <x-input-label for="phone" :value="__('Nomor WhatsApp')" class="text-gray-700 font-medium" />
+            <x-text-input id="phone" class="block mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors" 
+                type="tel" 
+                name="phone" 
+                :value="old('phone')" 
+                placeholder="Contoh: 08123456789"
+                required />
+            <p class="text-xs text-gray-500 mt-1">Masukkan nomor WhatsApp aktif untuk komunikasi</p>
+            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+        </div>
+
         <!-- Password -->
         <div>
             <x-input-label for="password" :value="__('Password')" class="text-gray-700 font-medium" />

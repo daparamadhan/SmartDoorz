@@ -9,7 +9,6 @@ use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\QrScannerController;
 use App\Http\Controllers\RentalController;
-use App\Http\Controllers\AdminController;
 
 // Landing page (public)
 Route::get('/', function () {
@@ -41,10 +40,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('barcode', BarcodeController::class);
         Route::resource('rooms', RoomController::class);
         Route::get('/rooms/{room}/print-qr', [RoomController::class, 'printQrCode'])->name('rooms.print-qr');
-        
-        // Room Allocation
-        Route::get('/admin/room-allocation', [AdminController::class, 'roomAllocation'])->name('admin.room-allocation');
-        Route::post('/admin/allocate-room', [AdminController::class, 'allocateRoom'])->name('admin.allocate-room');
+        Route::get('/rooms/{room}/download-qr', [RoomController::class, 'downloadQrCode'])->name('rooms.download-qr');
+        Route::get('/room-view', [RoomController::class, 'roomView'])->name('rooms.view');
     });
 
     // Send barcode link to user (admin)
@@ -72,5 +69,10 @@ Route::post('/api/scanner/scan', [QrScannerController::class, 'scanPublic'])->wi
 Route::get('/api/test', function() {
     return response()->json(['status' => 'API working', 'time' => now()]);
 });
+
+// Test scanner page
+Route::get('/test-scanner', function() {
+    return view('test-scanner');
+})->middleware('auth');
 
 
