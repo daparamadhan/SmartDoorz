@@ -9,10 +9,6 @@ use Illuminate\Support\Facades\Log;
 
 class QrScannerController extends Controller
 {
-    public function index()
-    {
-        return view('scanner.index');
-    }
 
     public function scan(Request $request)
     {
@@ -46,7 +42,30 @@ class QrScannerController extends Controller
             'qr_code' => $qrCode
         ]);
         
+        // Cek apakah user memiliki akses ke room
         $isAuthorized = $room->user_id === $currentUser->id;
+        
+        // Cek apakah sewa user sudah expired
+        $isRentalExpired = $currentUser->isRentalExpired();
+        
+        if ($isAuthorized && $isRentalExpired) {
+            // Log akses expired
+            DoorAccessLog::create([
+                'room_id' => $room->id,
+                'user_id' => $currentUser->id,
+                'qr_code' => $qrCode,
+                'status' => 'expired',
+                'access_time' => now(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+            
+            return response()->json([
+                'status' => 'expired',
+                'message' => 'Sewa Anda sudah berakhir pada ' . $currentUser->rental_end->format('d M Y H:i') . '. Silakan perpanjang sewa untuk mengakses kamar.',
+                'action' => 'error'
+            ]);
+        }
 
         // Log akses
         DoorAccessLog::create([
@@ -96,6 +115,33 @@ class QrScannerController extends Controller
 
             // Cari user berdasarkan room yang di-scan
             $userId = $room->user_id;
+            
+            if (!$userId) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Kamar tidak memiliki penyewa'
+                ]);
+            }
+            
+            // Cek apakah sewa user sudah expired
+            $roomOwner = \App\Models\User::find($userId);
+            if ($roomOwner && $roomOwner->isRentalExpired()) {
+                // Log akses expired
+                DoorAccessLog::create([
+                    'room_id' => $room->id,
+                    'user_id' => $userId,
+                    'qr_code' => $validated['qr_code'],
+                    'status' => 'expired',
+                    'access_time' => now(),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+                
+                return response()->json([
+                    'status' => 'expired',
+                    'message' => 'Sewa kamar ' . $room->room_number . ' sudah berakhir. Silakan hubungi admin.'
+                ]);
+            }
             
             // Log akses dengan user_id dari room owner
             DoorAccessLog::create([

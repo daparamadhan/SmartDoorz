@@ -20,7 +20,12 @@ class Room extends Model
 
     public function isAvailable()
     {
-        return $this->user_id === null || $this->user_id === 0;
+        // Ruangan tersedia jika:
+        // 1. Tidak ada user_id
+        // 2. User ada tapi sewa sudah expired
+        return $this->user_id === null || 
+               $this->user_id === 0 || 
+               ($this->user && $this->user->isRentalExpired());
     }
 
     public function getQrImageUrl()
@@ -40,23 +45,30 @@ class Room extends Model
         }
         
         if (!$this->user_id) {
-            return 'available';
+            return 'tersedia';
+        }
+        
+        // Cek apakah sewa user sudah expired
+        if ($this->user && $this->user->isRentalExpired()) {
+            return 'expired';
         }
         
         if ($this->user && $this->user->status === 'delay') {
             return 'delay';
         }
         
-        return 'occupied';
+        return 'ditempati';
     }
 
     public function getStatusColor()
     {
         switch ($this->getRoomStatus()) {
-            case 'available':
+            case 'tersedia':
                 return 'bg-green-500';
-            case 'occupied':
+            case 'ditempati':
                 return 'bg-red-500';
+            case 'expired':
+                return 'bg-orange-500';
             case 'delay':
                 return 'bg-blue-500';
             case 'maintenance':

@@ -21,6 +21,7 @@
                 <th class="text-left p-3">Nama</th>
                 <th class="text-left p-3">Email</th>
                 <th class="text-left p-3">No. WhatsApp</th>
+                <th class="text-left p-3">Status Sewa</th>
                 <th class="text-left p-3">Terdaftar</th>
                 <th class="text-center p-3">Aksi</th>
             </tr>
@@ -45,6 +46,27 @@
                             <span class="text-gray-400">-</span>
                         @endif
                     </td>
+                    <td class="p-3">
+                        @if(!$user->rental_start)
+                            <span class="inline-block px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+                                ⏳ Pending
+                            </span>
+                        @elseif($user->isRentalExpired())
+                            <span class="inline-block px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">
+                                ❌ Expired
+                            </span>
+                            <div class="text-xs text-gray-500 mt-1">
+                                {{ $user->rental_end->format('d M Y') }}
+                            </div>
+                        @else
+                            <span class="inline-block px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                                ✅ Aktif
+                            </span>
+                            <div class="text-xs text-gray-500 mt-1">
+                                s/d {{ $user->rental_end->format('d M Y') }}
+                            </div>
+                        @endif
+                    </td>
                     <td class="p-3">{{ $user->created_at->format('d M Y') }}</td>
                     <td class="p-3 text-center space-x-2">
                         <a href="{{ route('users.edit', $user->id) }}" class="bg-yellow-500 text-white px-2 py-1 rounded text-sm inline-block">Edit</a>
@@ -57,7 +79,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="p-3 text-center text-gray-500">Tidak ada data</td>
+                    <td colspan="7" class="p-3 text-center text-gray-500">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>

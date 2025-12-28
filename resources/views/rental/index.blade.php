@@ -22,31 +22,39 @@
                     <p class="text-gray-600 mt-2">Kelola masa sewa ruangan Anda per bulan</p>
                 </div>
 
-                @if(auth()->user()->rental_status == 'pending')
+                @if(!auth()->user()->rental_start)
                 <div class="mb-6 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <h3 class="text-lg font-semibold text-yellow-800 mb-2">⏳ Status: Menunggu Persetujuan</h3>
                     <p class="text-yellow-700">Akun Anda sedang dalam tahap pending. Admin akan segera mengalokasikan ruangan untuk Anda.</p>
                 </div>
-                @elseif(auth()->user()->rental_status == 'expired')
+                @elseif(auth()->user()->isRentalExpired())
                 <div class="mb-6 p-6 bg-red-50 border border-red-200 rounded-lg">
                     <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Sewa Berakhir</h3>
-                    <p class="text-red-700 mb-4">Masa sewa Anda telah berakhir pada {{ auth()->user()->rental_end->format('d M Y') }}.</p>
+                    <p class="text-red-700 mb-4">Masa sewa Anda telah berakhir pada {{ auth()->user()->rental_end->format('d M Y H:i') }}.</p>
+                    @if(auth()->user()->rooms->count() > 0)
                     <button onclick="showPaymentModal()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition font-semibold">
                         💳 Perpanjang Sewa Sekarang
                     </button>
+                    @else
+                    <p class="text-red-600 text-sm">Hubungi admin untuk mendapatkan ruangan.</p>
+                    @endif
                 </div>
                 @else
                 <div class="mb-6 p-6 bg-green-50 border border-green-200 rounded-lg">
                     <h3 class="text-lg font-semibold text-green-800 mb-2">✅ Sewa Aktif</h3>
                     <p class="text-green-700 mb-2">Masa sewa berakhir: <strong>{{ auth()->user()->rental_end->format('d M Y H:i') }}</strong></p>
                     <p class="text-sm text-green-600 mb-4">Sisa waktu: {{ auth()->user()->rental_end->diffForHumans() }}</p>
+                    @if(auth()->user()->rooms->count() > 0)
                     <button onclick="showPaymentModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition font-semibold">
                         💳 Perpanjang Sewa (+1 Bulan)
                     </button>
+                    @else
+                    <p class="text-yellow-600 text-sm">Hubungi admin untuk mendapatkan ruangan.</p>
+                    @endif
                 </div>
                 @endif
 
-                @if(auth()->user()->rental_status == 'active')
+                @if(!auth()->user()->isRentalExpired() && auth()->user()->rental_start && auth()->user()->rooms->count() > 0)
                 <div class="border-t pt-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">🔓 Akses Ruangan</h3>
                     <div class="mb-6 text-center">
@@ -80,7 +88,7 @@
                     <div class="bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-green-500 p-4 rounded">
                         <p class="font-semibold text-gray-900">Ruangan {{ $room->room_number }}</p>
                         <p class="text-xs text-gray-600 mt-1 font-mono break-all">{{ $room->qr_code }}</p>
-                        @if(auth()->user()->rental_status == 'active')
+                        @if(!auth()->user()->isRentalExpired() && auth()->user()->rental_start)
                         <button type="button" onclick="testScan('{{ $room->qr_code }}')" 
                             class="mt-3 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 rounded text-sm transition">
                             Test Scan

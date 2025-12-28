@@ -7,10 +7,6 @@ use Carbon\Carbon;
 
 class RentalController extends Controller
 {
-    public function index()
-    {
-        return view('rental.index');
-    }
     
     public function extend(Request $request)
     {
@@ -21,6 +17,14 @@ class RentalController extends Controller
         ]);
         
         $user = auth()->user();
+        
+        // Validasi user harus punya ruangan
+        if ($user->rooms->count() === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda belum memiliki ruangan. Hubungi admin untuk mendapatkan ruangan.'
+            ]);
+        }
         
         // Calculate new end date
         if ($user->rental_end && $user->rental_end->isFuture()) {

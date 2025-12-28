@@ -43,6 +43,9 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
+            'rental_start' => 'nullable|date',
+            'rental_end' => 'nullable|date|after_or_equal:rental_start',
+            'rental_months' => 'nullable|integer|min:0',
         ]);
 
         if ($validated['password']) {
@@ -53,7 +56,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui');
+        return redirect()->route('users.edit', $user)->with('success', 'User berhasil diperbarui');
     }
 
     public function destroy(User $user)

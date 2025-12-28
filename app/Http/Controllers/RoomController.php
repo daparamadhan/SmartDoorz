@@ -16,11 +16,15 @@ class RoomController extends Controller
     public function index()
     {
         $rooms = Room::with('user')->paginate(12);
-        $available = Room::where('status', 'available')->count();
-        $occupied = Room::where('status', 'occupied')->count();
-        $maintenance = Room::where('status', 'maintenance')->count();
         
-        return view('rooms.index', compact('rooms', 'available', 'occupied', 'maintenance'));
+        // Hitung statistik berdasarkan status dinamis
+        $allRooms = Room::with('user')->get();
+        $tersedia = $allRooms->filter(fn($room) => $room->getRoomStatus() === 'tersedia')->count();
+        $ditempati = $allRooms->filter(fn($room) => $room->getRoomStatus() === 'ditempati')->count();
+        $expired = $allRooms->filter(fn($room) => $room->getRoomStatus() === 'expired')->count();
+        $maintenance = $allRooms->filter(fn($room) => $room->getRoomStatus() === 'maintenance')->count();
+        
+        return view('rooms.index', compact('rooms', 'tersedia', 'ditempati', 'expired', 'maintenance'));
     }
 
     public function create()

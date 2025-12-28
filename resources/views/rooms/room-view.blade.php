@@ -16,6 +16,10 @@
                     <span class="text-sm">Terisi</span>
                 </div>
                 <div class="flex items-center">
+                    <div class="w-4 h-4 bg-orange-500 rounded mr-2"></div>
+                    <span class="text-sm">Expired</span>
+                </div>
+                <div class="flex items-center">
                     <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
                     <span class="text-sm">Delay</span>
                 </div>
@@ -33,8 +37,9 @@
                     $roomStatus = $room->getRoomStatus();
                     $statusColor = $room->getStatusColor();
                     $statusText = match($roomStatus) {
-                        'available' => 'Kosong',
-                        'occupied' => 'Terisi',
+                        'tersedia' => 'Kosong',
+                        'ditempati' => 'Terisi', 
+                        'expired' => 'Expired',
                         'delay' => 'Delay',
                         'maintenance' => 'Maintenance',
                         default => 'Unknown'
@@ -67,7 +72,7 @@
             <div class="bg-green-100 p-4 rounded-lg hover:bg-green-200 transition-colors">
                 <div class="flex items-center justify-between">
                     <div>
-                        <div class="text-2xl font-bold text-green-600">{{ $rooms->filter(fn($room) => $room->getRoomStatus() === 'available')->count() }}</div>
+                        <div class="text-2xl font-bold text-green-600">{{ $rooms->filter(fn($room) => $room->getRoomStatus() === 'tersedia')->count() }}</div>
                         <div class="text-sm text-green-700">Kamar Kosong</div>
                     </div>
                     <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
@@ -81,7 +86,7 @@
             <div class="bg-red-100 p-4 rounded-lg hover:bg-red-200 transition-colors">
                 <div class="flex items-center justify-between">
                     <div>
-                        <div class="text-2xl font-bold text-red-600">{{ $rooms->filter(fn($room) => $room->getRoomStatus() === 'occupied')->count() }}</div>
+                        <div class="text-2xl font-bold text-red-600">{{ $rooms->filter(fn($room) => $room->getRoomStatus() === 'ditempati')->count() }}</div>
                         <div class="text-sm text-red-700">Kamar Terisi</div>
                     </div>
                     <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
@@ -92,13 +97,13 @@
                 </div>
             </div>
             
-            <div class="bg-blue-100 p-4 rounded-lg hover:bg-blue-200 transition-colors">
+            <div class="bg-orange-100 p-4 rounded-lg hover:bg-orange-200 transition-colors">
                 <div class="flex items-center justify-between">
                     <div>
-                        <div class="text-2xl font-bold text-blue-600">{{ $rooms->filter(fn($room) => $room->getRoomStatus() === 'delay')->count() }}</div>
-                        <div class="text-sm text-blue-700">Kamar Delay</div>
+                        <div class="text-2xl font-bold text-orange-600">{{ $rooms->filter(fn($room) => $room->getRoomStatus() === 'expired')->count() }}</div>
+                        <div class="text-sm text-orange-700">Kamar Expired</div>
                     </div>
-                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
