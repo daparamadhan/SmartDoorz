@@ -94,10 +94,13 @@ class QrScannerController extends Controller
                 ]);
             }
 
-            // Log akses tanpa user_id (akses publik)
+            // Cari user berdasarkan room yang di-scan
+            $userId = $room->user_id;
+            
+            // Log akses dengan user_id dari room owner
             DoorAccessLog::create([
                 'room_id' => $room->id,
-                'user_id' => null,
+                'user_id' => $userId, // Gunakan user_id dari room owner
                 'qr_code' => $validated['qr_code'],
                 'status' => 'success',
                 'access_time' => now(),

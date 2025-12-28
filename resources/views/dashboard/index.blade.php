@@ -144,6 +144,9 @@
                         <td class="px-4 py-3 text-gray-900">
                             @if($log->user)
                                 <span class="font-medium">{{ $log->user->name }}</span>
+                            @elseif($log->room && $log->room->user)
+                                <span class="font-medium text-blue-600">{{ $log->room->user->name }}</span>
+                                <span class="text-xs text-gray-500 block">(via QR Room)</span>
                             @else
                                 <span class="text-gray-500 italic">Unknown</span>
                             @endif
