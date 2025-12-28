@@ -107,19 +107,4 @@ Route::get('/barcode/download/{user}/{file}', [BarcodeController::class, 'downlo
 // Public scanner route (no CSRF)
 Route::post('/api/scanner/scan', [QrScannerController::class, 'scanPublic'])->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
 
-// Test route
-Route::get('/api/test', function() {
-    return response()->json(['status' => 'API working', 'time' => now()]);
-});
-
-// Test scanner page
-Route::get('/test-scanner', function() {
-    return view('test-scanner');
-})->middleware('auth');
-
-// Test expired page
-Route::get('/test-expired', function() {
-    return view('test-expired');
-})->middleware('auth');
-
 
