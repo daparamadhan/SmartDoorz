@@ -9,7 +9,7 @@
 
 ## Tentang Proyek: SmartDoorz (Sistem Manajemen Akses Pintu Digital)
 
-Proyek **SmartDoorz** adalah aplikasi berbasis web yang dirancang untuk sistem manajemen akses pintu digital menggunakan teknologi **QR Code** sebagai metode autentikasi utama. Sistem ini dikembangkan untuk menggantikan penggunaan kunci fisik konvensional dengan solusi yang lebih efisien, aman, dan mudah dikelola, khususnya untuk lingkungan kos-kosan atau apartemen.
+Proyek SmartDoorz adalah aplikasi berbasis web yang dirancang untuk sistem manajemen akses pintu digital menggunakan teknologi QR Code sebagai metode autentikasi utama. Sistem ini dikembangkan untuk menggantikan penggunaan kunci fisik konvensional dengan solusi yang lebih efisien, aman, dan mudah dikelola, khususnya untuk lingkungan kos-kosan atau apartemen.
 
 Aplikasi ini berfungsi sebagai platform manajemen terpusat yang memungkinkan administrator untuk mengelola hak akses pengguna secara *real-time*, memantau aktivitas akses ruangan, dan mengintegrasikan sistem dengan perangkat keras IoT untuk kontrol pintu otomatis.
 
@@ -139,15 +139,9 @@ Sistem ini dapat dikembangkan lebih lanjut dengan:
 
 ## Identitas Pengembang
 
-- **Nama**: Daffa Ramadhan
-- **NIM**: 714240018
-- **Program Studi**: D4 TI ULBI
-- **Kelas**: 2B
+- Daffa Ramadhan
+- Moch Farizal T.G
 
-- **Nama**: Moch Farizal T.G
-- **NIM**: 714240043
-- **Program Studi**: D4 TI ULBI
-- **Kelas**: 2B
 
 ## Lisensi
 
